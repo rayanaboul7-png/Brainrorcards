@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brainrot Cards — Collect, Trade & Win</title>
+<meta name="description" content="Brainrot Cards. Collect hilarious characters, trade by rarity and win prizes. Pricing: 1,000 ISK per 5-card pack or 8,500 ISK per 10-pack box." />
+<style>
+  :root{
+    --bg:#0e1014; --panel:#131621; --muted:#9aa3b2; --text:#e8eef9;
+    --accent:#8a7dff; --accent2:#00e0ff;
+    --legendary:#d4ad31; --epic:#a462ff; --rare:#3bb6ff; --common:#cfd8e3;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:linear-gradient(180deg,#0b0d12,#0e1014);color:var(--text);font:400 16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+  a{color:var(--accent2);text-decoration:none}
+  .wrap{max-width:1100px;margin:auto;padding:24px}
+  header{position:sticky;top:0;background:rgba(14,16,20,.7);backdrop-filter: blur(8px);border-bottom:1px solid #1e2330;z-index:5}
+  nav{display:flex;align-items:center;gap:18px;justify-content:space-between}
+  .brand{font-weight:800;letter-spacing:.4px}
+  .nav a{color:#c7d0e2;margin:0 10px}
+  .hero{padding:40px 0 10px}
+  .h1{font-size:clamp(28px,4.5vw,44px);font-weight:800;line-height:1.1}
+  .h1 b{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{color:#b8c1d3;max-width:800px}
+  .cta{display:flex;gap:12px;margin:18px 0 4px;flex-wrap:wrap}
+  .btn{padding:12px 16px;border:1px solid #2a3142;border-radius:10px;background:#181c29;color:#eaf0ff}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#071019;border:0;font-weight:700}
+  section{padding:28px 0}
+  .section-title{font-weight:800;font-size:22px;margin:0 0 10px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 16px}
+  .chip{padding:8px 12px;border:1px solid #2a3142;border-radius:999px;color:#cbd5e7;background:#131826;cursor:pointer}
+  .chip.active{border-color:var(--accent);color:#fff}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+  .card{background:linear-gradient(180deg,#141826,#10131c);border:1px solid #22293a;border-radius:14px;overflow:hidden;box-shadow:0 5px 22px rgba(0,0,0,.25)}
+  .thumb{width:100%;aspect-ratio:4/3;background:#0d111a;display:block}
+  .pad{padding:12px}
+  .name{font-weight:800}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;margin-top:6px;border:1px solid #2a3142}
+  .legendary{color:#231a00;background:linear-gradient(90deg,#ffd36b,#ffecb5);border:0}
+  .epic{color:#2a0046;background:linear-gradient(90deg,#cd9bff,#e8d6ff);border:0}
+  .rare{color:#00223c;background:linear-gradient(90deg,#8be0ff,#d0f2ff);border:0}
+  .common{color:#1a2433;background:#e5edf7;border:0}
+  .stats{display:flex;gap:10px;margin-top:8px;font-weight:700}
+  .pill{padding:6px 10px;border-radius:8px;background:#0f1320;border:1px solid #253049}
+  .pricing{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .price-card{background:linear-gradient(180deg,#141826,#10131c);border:1px solid #22293a;border-radius:14px;padding:18px}
+  .price{font-size:26px;font-weight:800;margin:4px 0}
+  .muted{color:var(--muted)}
+  footer{border-top:1px solid #1e2330;color:#97a3b8;padding:24px 0;margin-top:10px}
+  /* small helper */
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="brand">🧠 Brainrot Cards</div>
+      <div class="nav">
+        <a href="#collection">Collection</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#prizes">Prizes</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap hero">
+  <div class="h1">Collect. Trade. <b>Win.</b></div>
+  <p class="lead">
+    Meet the weirdest crew in town: coffee assassins, space giraffes, jet geese and more. 
+    Browse by rarity, check stats, and grab packs to unlock prizes.
+  </p>
+  <div class="cta">
+    <a class="btn primary" href="#pricing">Buy packs</a>
+    <a class="btn" href="#collection">View collection</a>
+  </div>
+</div>
+
+<section id="collection" class="wrap">
+  <h2 class="section-title">The Collection</h2>
+  <div class="muted">Filter by rarity and tap a card for details.</div>
+  <div class="filters">
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="Legendary">Legendary</button>
+    <button class="chip" data-filter="Epic">Epic</button>
+    <button class="chip" data-filter="Rare">Rare</button>
+    <button class="chip" data-filter="Common">Common</button>
+  </div>
+  <div id="grid" class="grid"></div>
+</section>
+
+<section id="pricing" class="wrap">
+  <h2 class="section-title">Pricing</h2>
+  <div class="pricing">
+    <div class="price-card">
+      <div class="muted">Single pack</div>
+      <div class="price">1,000 ISK</div>
+      <div>5 cards • random rarity</div>
+      <div class="cta" style="margin-top:12px"><a class="btn primary" href="#prizes">Get pack</a></div>
+    </div>
+    <div class="price-card">
+      <div class="muted">Box</div>
+      <div class="price">8,500 ISK</div>
+      <div>10 packs • better odds</div>
+      <div class="cta" style="margin-top:12px"><a class="btn primary" href="#prizes">Get box</a></div>
+    </div>
+  </div>
+</section>
+
+<section id="prizes" class="wrap">
+  <h2 class="section-title">Prizes you can win</h2>
+  <ul>
+    <li>Weekly draw: 1 random <b>Legendary</b> card between all buyers.</li>
+    <li>Top trader award: exclusive foil version of a random <b>Epic</b>.</li>
+    <li>Monthly raffle: 1 full sealed <b>Box (10 packs)</b>.</li>
+  </ul>
+  <p class="muted">* Replace this text with your final prize list. (In the code, find the <span class="mono">&lt;section id="prizes"&gt;</span> block.)</p>
+</section>
+
+<section id="faq" class="wrap">
+  <h2 class="section-title">FAQ</h2>
+  <p><b>How do rarities work?</b><br/>Common &lt; Rare &lt; Epic &lt; Legendary. Packs include a mix with chances weighted by rarity.</p>
+  <p><b>Where can I trade?</b><br/>Anywhere you like. Local swaps, Discord, or IRL events.</p>
+  <p><b>Are these characters real?</b><br/>As real as a space giraffe with boots. Have fun.</p>
+</section>
+
+<footer>
+  <div class="wrap">© <span id="y"></span> Brainrot Cards</div>
+</footer>
+
+<script>
+  // ---------- Data (20 cards with your rarities) ----------
+  const CARDS = [
+    // Legendary (gold frame images)
+    {name:"BOMBARDIRO CROCODILO", rarity:"Legendary", atk:180, def:175, note:"Airstrike legend."},
+    {name:"TRALALERO", rarity:"Legendary", atk:170, def:160, note:"Three-leg dash."},
+    {name:"TUN TUN TUN ZAHUR", rarity:"Legendary", atk:180, def:150, note:"Ancient club swing."},
+
+    // Epic (purple frame images)
+    {name:"BONEKA AMBALABU", rarity:"Epic", atk:80, def:85, note:"Rubber bounce."},
+    {name:"CAPUCHINO ASESINO", rarity:"Epic", atk:70, def:80, note:"Double slash."},
+    {name:"BALLERINA CAPPUCCINA", rarity:"Epic", atk:70, def:65, note:"Creamy spin."},
+    {name:"FRIGO CAMELO", rarity:"Epic", atk:72, def:82, note:"Desert chill gust."},
+    {name:"ZIBRA ZUBRA ZEBRALINI", rarity:"Epic", atk:75, def:85, note:"Watermelon charge."},
+
+    // Rare (blue frame images)
+    {name:"VACA SATURNO SATURNITA", rarity:"Rare", atk:76, def:74, note:"Planet hop."},
+    {name:"CACTO HIPOPOTAMO", rarity:"Rare", atk:77, def:78, note:"Poison thorns."},
+    {name:"TRULIMERO TRULICHINA", rarity:"Rare", atk:72, def:77, note:"Tropical strike."},
+    {name:"LIRILI LARILA", rarity:"Rare", atk:70, def:74, note:"Cactus morph."},
+    {name:"BOMBOMBINI GUSINI", rarity:"Rare", atk:78, def:72, note:"Goose explosion."},
+    {name:"BRR BRR PATAPIM", rarity:"Rare", atk:70, def:70, note:"Giant stomp."},
+
+    // Common (white frame images)
+    {name:"JIRAFFA CELESTE", rarity:"Common", atk:61, def:65, note:"Space hop."},
+    {name:"MADIN DIN DIN DUN", rarity:"Common", atk:64, def:65, note:"Acid juice shot."},
+    {name:"ESPRESSONA SIGNORA", rarity:"Common", atk:57, def:52, note:"Stare freeze."},
+    {name:"FRULI FRULA", rarity:"Common", atk:58, def:52, note:"Sandstorm flap."},
+    {name:"TRIPI TROPI", rarity:"Common", atk:58, def:60, note:"Belly quake."},
+    {name:"CHIMPANZINI BANANINI", rarity:"Common", atk:58, def:60, note:"Banana blast."},
+  ];
+
+  // ---------- Helper: on-the-fly SVG placeholder as "image" ----------
+  function svgPlaceholder(title, rarity){
+    const grad = {
+      Legendary:['#3b2a00','#d4ad31'],
+      Epic:['#2a1146','#a462ff'],
+      Rare:['#032a46','#3bb6ff'],
+      Common:['#1a2333','#cfd8e3']
+    }[rarity] || ['#121826','#8a7dff'];
+
+    const label = rarity.toUpperCase();
+    const svg =
+`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 900'>
+  <defs>
+    <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+      <stop offset='0' stop-color='${grad[0]}'/>
+      <stop offset='1' stop-color='${grad[1]}'/>
+    </linearGradient>
+  </defs>
+  <rect width='1200' height='900' fill='url(#g)'/>
+  <text x='50%' y='46%' font-size='88' font-family='Arial, Helvetica, sans-serif'
+        fill='white' text-anchor='middle' font-weight='800' opacity='0.95'>
+    ${title.replace(/&/g,'&amp;')}
+  </text>
+  <text x='50%' y='80%' font-size='44' font-family='Arial, Helvetica, sans-serif'
+        fill='rgba(255,255,255,.9)' text-anchor='middle' font-weight='700'>
+    ${label}
+  </text>
+</svg>`;
+    return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+  }
+
+  // ---------- Render ----------
+  const grid = document.getElementById('grid');
+  function render(filter='all'){
+    grid.innerHTML = '';
+    CARDS.filter(c => filter==='all' || c.rarity===filter).forEach(c=>{
+      const el = document.createElement('article');
+      el.className='card';
+      const badgeClass = c.rarity.toLowerCase();
+      const img = svgPlaceholder(c.name, c.rarity);
+      el.innerHTML = `
+        <img class="thumb" src="${img}" alt="${c.name}"/>
+        <div class="pad">
+          <div class="name">${c.name}</div>
+          <span class="badge ${badgeClass}">${c.rarity}</span>
+          <div class="stats">
+            <div class="pill">ATK: ${c.atk}</div>
+            <div class="pill">DEF: ${c.def}</div>
+          </div>
+          <div class="muted" style="margin-top:8px">${c.note}</div>
+        </div>`;
+      grid.appendChild(el);
+    });
+  }
+  render();
+
+  // Filters
+  document.querySelectorAll('.chip').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+      ch.classList.add('active');
+      render(ch.dataset.filter);
+    });
+  });
+
+  // Footer year
+  document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
