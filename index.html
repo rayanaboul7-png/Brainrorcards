@@ -1,307 +1,231 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Brainrot Cards — One-file</title>
-  <meta name="description" content="Colecciona cartas Brainrot de edición limitada.">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brainrot Cards — Collect, Trade, Win</title>
+  <meta name="description" content="Brainrot Cards is a collectible card game. Open packs, build your set, trade with friends and win prizes." />
+
   <style>
-:root{
-  --bg:#0a0a0d;
-  --panel:#121218;
-  --card:#161621;
-  --text:#e7e7ef;
-  --muted:#b4b4c7;
-  --accent:#00ffd1;
-  --accent-2:#a64dff;
-  --danger:#ff4d6d;
-  --success:#12d18e;
-  --shadow:0 10px 30px rgba(0,0,0,.4);
-}
-
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, "Noto Sans", sans-serif;
-  color:var(--text); background:radial-gradient(1200px 800px at 10% -10%, rgba(166,77,255,.15), transparent 40%),
-                     radial-gradient(1200px 800px at 90% 10%, rgba(0,255,209,.12), transparent 40%),
-                     var(--bg);
-}
-
-.container{ max-width:1200px; margin:0 auto; padding:0 20px;}
-
-.header{ position:sticky; top:0; backdrop-filter:saturate(140%) blur(8px);
-  background:rgba(10,10,13,.7); border-bottom:1px solid rgba(255,255,255,.06); z-index:100; }
-.nav{ display:flex; align-items:center; gap:20px; padding:10px 0; }
-.nav a{ color:var(--muted); text-decoration:none; padding:10px 12px; border-radius:8px; }
-.nav a:hover{ color:var(--text); background:rgba(255,255,255,.05); }
-.logo{ display:flex; align-items:center; gap:10px; }
-.logo img{ height:32px; }
-
-.hero{ padding:64px 0 32px; }
-.hero h1{ font-size: clamp(28px, 6vw, 52px); margin:10px 0 8px; line-height:1.1; }
-.hero p{ color:var(--muted); margin-top:0; max-width:840px; }
-.badges{ display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 0;}
-.badge{ padding:8px 12px; border-radius:999px; background:#151521; color:#cbd; border:1px solid rgba(255,255,255,.08); font-weight:600; }
-.cta{ display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; }
-.btn{ display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:var(--text); text-decoration:none; box-shadow:var(--shadow) }
-.btn:hover{ transform:translateY(-1px); }
-.btn.primary{ background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#0a0a0d; border:none; font-weight:800; }
-
-.section{ padding:40px 0 30px; }
-.section h2{ font-size: clamp(22px, 4.2vw, 34px); margin:0 0 8px; }
-.section p.lead{ color:var(--muted); margin:0 0 24px; }
-
-.grid{ display:grid; grid-template-columns: repeat( auto-fill, minmax(180px, 1fr) ); gap:16px; }
-.card{
-  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  border:1px solid rgba(255,255,255,.08); border-radius:16px; overflow:hidden; box-shadow:var(--shadow);
-  display:flex; flex-direction:column;
-}
-.card img{ width:100%; aspect-ratio: 5 / 7; object-fit: cover; background:#101018; }
-.card .meta{ padding:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
-.rarity{ font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.08em; padding:6px 10px; border-radius:999px; }
-.rarity.legendaria{ background:linear-gradient(90deg, #ffd700, #b8860b); color:#111; }
-.rarity.epica{ background:linear-gradient(90deg, #8a2be2, #4b0082); }
-.rarity.rara{ background:linear-gradient(90deg, #0070f3, #001a66); }
-.rarity.comun{ background:linear-gradient(90deg, #c0c0c0, #4a4a4a); }
-
-.filters{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
-.filter{ padding:8px 12px; border-radius:10px; background:#161621; border:1px solid rgba(255,255,255,.08); color:#cbd; cursor:pointer; }
-.filter.active{ outline:2px solid var(--accent); }
-
-.pack{ background:linear-gradient(180deg, rgba(0,255,209,.08), rgba(166,77,255,.08)); border:1px dashed rgba(255,255,255,.15); border-radius:16px; padding:16px; }
-.pack-output{ display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
-.pack-output img{ width:130px; height:auto; border-radius:12px; border:1px solid rgba(255,255,255,.08) }
-
-.kpis{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:12px; }
-.kpi{ background:#12121a; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px; text-align:center; }
-.kpi .num{ font-size:28px; font-weight:800; }
-
-.prizes{ display:grid; grid-template-columns: repeat( auto-fit, minmax(240px, 1fr) ); gap:12px; }
-.prize{ background:#12121a; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px; }
-
-.form{ background:#12121a; border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px; }
-.form label{ display:block; margin:8px 0 4px; color:#cbd }
-.form input, .form textarea, .form select{
-  width:100%; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#0f0f16; color:#e7e7ef;
-}
-.form button{ margin-top:12px }
-
-.footer{ padding:32px 0 64px; color:#a9a9b9; font-size:14px; text-align:center }
-.footer a{ color:var(--muted) }
-.small{ font-size:13px; color:var(--muted) }
-
-.modal{ position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.6); z-index:200; }
-.modal.open{ display:grid; }
-.modal .dialog{ background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:16px; max-width:min(92vw, 900px); padding:16px; }
-.modal .dialog img{ width:100%; border-radius:12px; }
-.modal .dialog .title{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
-.modal .dialog .title h3{ margin:8px 0 12px; }
-.modal .dialog .close{ background:transparent; border:1px solid rgba(255,255,255,.15); color:#ddd; border-radius:10px; padding:8px 12px; cursor:pointer; }
-
-code.inline{ background:#171722; padding:2px 6px; border-radius:6px; font-size:85% }
-</style>
+    :root{
+      --bg:#0b0f14; --panel:#121821; --muted:#99a3b3; --text:#e8eef9;
+      --brandA:#8cf; --brandB:#9f6bff; --brandC:#00e7b3;
+      --legendaryA:#d4af37; --legendaryB:#9a6c00;
+      --epic:#7e38ff; --rare:#4098ff; --common:#1db896;
+      --card:#0f141d; --chip:#0e1320;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:radial-gradient(1200px 600px at 10% -10%, #0d1623 0%, #0b0f14 50%, #090c11 100%); color:var(--text); font:500 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1100px;margin:0 auto;padding:20px}
+    header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.6) 70%, transparent);backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid rgba(255,255,255,.04)}
+    nav{display:flex;align-items:center;gap:18px;padding:12px 0}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .brand span{display:inline-block;background:linear-gradient(90deg,var(--brandA),var(--brandB),var(--brandC));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .navlinks{margin-left:auto;display:flex;gap:14px;font-weight:600;color:#cfe3ff}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:800}
+    .btn.primary{background:linear-gradient(90deg,var(--brandA),var(--brandB));color:#061018;box-shadow:0 10px 30px -10px var(--brandB)}
+    .btn.ghost{background:#1a2130;border:1px solid #243049;color:#cfe3ff}
+    .hero{display:grid;gap:22px;padding:36px 0 8px}
+    .hero h1{font-size:clamp(28px,6vw,48px);line-height:1.05;margin:4px 0}
+    .hero h1 .accent{background:linear-gradient(90deg,#6cf,#6f6bff,#00e7b3);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .muted{color:var(--muted)}
+    section{padding:26px 0;border-top:1px solid rgba(255,255,255,.06)}
+    h2{font-size:clamp(22px,4vw,30px);margin:0 0 10px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 18px}
+    .chip{padding:8px 12px;border-radius:999px;background:var(--chip);color:#cfe3ff;border:1px solid #1e2a3d;font-weight:700;font-size:14px;cursor:pointer;user-select:none}
+    .chip.active{outline:2px solid #4ea2ff}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+    .card{background:var(--card);border:1px solid #1b2636;border-radius:14px;overflow:hidden}
+    .thumb{aspect-ratio:4/3;background:#0b0f14;display:grid;place-items:center}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .pad{padding:12px}
+    .title{font-weight:800}
+    .row{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+    .rar{font-weight:900;font-size:12px;letter-spacing:.4px;padding:4px 8px;border-radius:8px}
+    .legendary{background:linear-gradient(90deg,var(--legendaryA),var(--legendaryB));color:#1a1400}
+    .epic{background:linear-gradient(90deg,#b98bff,#7e38ff);color:#170a2e}
+    .rare{background:linear-gradient(90deg,#8ec3ff,#4098ff);color:#06162e}
+    .common{background:linear-gradient(90deg,#89f0cf,#1db896);color:#00261c}
+    .stats{font-weight:800;color:#b7c6dd}
+    .kpi{display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:10px}
+    .kpi>div{background:#0f1623;border:1px solid #1c2a40;padding:14px;border-radius:12px}
+    footer{padding:40px 0;color:#98a7be}
+    .note{background:#0e1522;border:1px dashed #2a3b56;padding:12px;border-radius:10px;margin-top:10px}
+    .small{font-size:13px}
+  </style>
 </head>
 <body>
-<header class="header">
-  <div class="container nav">
-    <a class="logo" href="#"><strong>Brainrot Cards</strong></a>
-    <nav style="margin-left:auto">
-      <a href="#coleccion">Colección</a>
-      <a href="#comprar">Comprar</a>
-      <a href="#premios">Premios</a>
-      <a href="#preguntas">FAQ</a>
-    </nav>
-  </div>
-</header>
-
-<main>
-  <section class="hero container">
-    <h1>Colecciona. Intercambia. <span style="background:linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; background-clip:text; color:transparent;">Gana.</span></h1>
-    <p>Versión de prueba en un solo archivo para subir rápido desde el móvil. Precio: <strong id="kpi-price">1.000 ISK</strong> — Stock: <strong id="kpi-remaining">1.500</strong> de <strong id="kpi-total">1.500</strong>.</p>
-    <div class="cta">
-      <a class="btn primary" id="buy-now">Comprar ahora</a>
-      <a class="btn" href="#comprar">Cómo funciona</a>
+  <header>
+    <div class="wrap">
+      <nav>
+        <div class="brand">Brainrot <span>Cards</span></div>
+        <div class="navlinks">
+          <a href="#collection">Collection</a>
+          <a href="#prizes">Prizes</a>
+          <a href="#buy">Buy</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </nav>
     </div>
-  </section>
+  </header>
 
-  <section id="coleccion" class="section container">
-    <h2>La colección</h2>
-    <p class="lead">Explora los personajes. Filtra por rareza y mira detalles.</p>
-    <div class="filters">
-      <button class="filter active" data-filter="todas">Todas</button>
-      <button class="filter" data-filter="legendaria">Legendaria</button>
-      <button class="filter" data-filter="epica">Épica</button>
-      <button class="filter" data-filter="rara">Rara</button>
-      <button class="filter" data-filter="comun">Común</button>
-    </div>
-    <div id="characters-grid" class="grid" aria-live="polite"></div>
-  </section>
+  <main class="wrap">
+    <section class="hero">
+      <h1>Collect. Trade. <span class="accent">Win.</span></h1>
+      <p class="muted">
+        Brainrot Cards is a tongue-in-cheek collectible card game with absurd characters and real stats. 
+        Open packs, hunt rarities, and enter prize draws with every purchase.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn primary" href="#buy">Buy packs</a>
+        <a class="btn ghost" href="#how">How it works</a>
+      </div>
+      <div class="kpi">
+        <div><strong>Rarities</strong><br/>Legendary • Epic • Rare • Common</div>
+        <div><strong>Pack odds</strong><br/>Guaranteed 1 Rare+ per pack <span class="small">(example — adjust if needed)</span></div>
+      </div>
+    </section>
 
-  <section class="section container">
-    <h2>Abrir un sobre (simulación)</h2>
-    <p class="lead">Probabilidades reales (1% legendaria, 9% épica, 30% rara, 60% común).</p>
-    <div class="pack">
-      <button class="btn" id="open-pack">Abrir sobre</button>
-      <div id="pack-out" class="pack-output" aria-live="polite"></div>
-      <p class="small">Solo demo.</p>
-    </div>
-  </section>
+    <section id="collection">
+      <h2>The collection</h2>
+      <p class="muted">Explore the characters. Filter by rarity and tap a card for details.</p>
 
-  <section id="comprar" class="section container">
-    <h2>Comprar</h2>
-    <p class="lead">Checkout en Stripe con tarjeta/Apple Pay (cuando pongas tu link).</p>
-    <div class="kpis">
-      <div class="kpi"><div class="num" id="kpi-price">1.000 ISK</div><div>Precio por sobre</div></div>
-      <div class="kpi"><div class="num" id="kpi-total">1.500</div><div>Edición limitada</div></div>
-      <div class="kpi"><div class="num" id="kpi-remaining">1.500</div><div>Disponibles</div></div>
-    </div>
-  </section>
-</main>
+      <div class="chips" id="filters">
+        <div class="chip active" data-rarity="all">All</div>
+        <div class="chip" data-rarity="Legendary">Legendary</div>
+        <div class="chip" data-rarity="Epic">Epic</div>
+        <div class="chip" data-rarity="Rare">Rare</div>
+        <div class="chip" data-rarity="Common">Common</div>
+      </div>
 
-<footer class="footer">
-  <div class="container">
-    <p class="small">Versión de prueba en un archivo. Al pasar a Netlify final, usamos la carpeta completa.</p>
-  </div>
-</footer>
+      <div class="grid" id="cardsGrid" aria-live="polite"></div>
 
-<div id="modal" class="modal" role="dialog" aria-modal="true" aria-label="Vista de carta">
-  <div class="dialog">
-    <div class="title">
-      <h3>Título carta</h3>
-      <button class="close" aria-label="Cerrar">Cerrar</button>
-    </div>
-    <img src="" alt="">
-    <div style="display:flex; justify-content:flex-end; margin-top:8px">
-      <span class="rarity comun">común</span>
-    </div>
-  </div>
-</div>
+      <div class="note small">
+        <strong>How to add/change cards:</strong> upload images into <code>/cards/</code> and edit the array at the bottom of this file 
+        (name, rarity, atk/def, image path). No build tools needed.
+      </div>
+    </section>
 
-<script>
+    <section id="prizes">
+      <h2>Prizes you can win</h2>
+      <p class="muted">Every purchase gives you entries to our draws. Replace this list with your real prizes.</p>
+      <ul>
+        <li>🟨 <strong>Grand prize:</strong> <em>[replace]</em> — e.g., 1× full sealed box or special item.</li>
+        <li>🟪 <strong>Epic prize:</strong> <em>[replace]</em> — e.g., Limited card bundle (5 packs).</li>
+        <li>🟦 <strong>Rare prize:</strong> <em>[replace]</em> — e.g., Single pack + sticker set.</li>
+        <li>🟩 <strong>Bonus:</strong> <em>[replace]</em> — e.g., Gift card or voucher.</li>
+      </ul>
+      <div class="small muted">Draw schedule & terms: [replace with dates, how winners are contacted, etc.]</div>
+    </section>
 
-const STRIPE_CHECKOUT_URL = "https://buy.stripe.com/your-checkout-link"; // Pon aquí tu link real de Stripe
-const PRICE_PER_PACK = 1000;
-let INVENTORY_TOTAL = 1500;
-let inventorySold = 0;
+    <section id="how">
+      <h2>How it works</h2>
+      <ol>
+        <li><strong>Buy packs</strong> (details below). Each pack has 5 cards and entries for the prize draw.</li>
+        <li><strong>Open & collect.</strong> Trade with friends and chase Legendary/Epic hits.</li>
+        <li><strong>Check results.</strong> We announce winners on our site & social channels.</li>
+      </ol>
+    </section>
 
-const rarityWeights = { legendaria: 1, epica: 9, rara: 30, comun: 60 };
-const CHARACTERS = [{"id": "tralalero-tralala", "name": "Tralalero Tralala", "rarity": "legendaria", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Tralalero Tralala (legendaria)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23FFD700'/>      <stop offset='1' stop-color='%23B8860B'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Tralalero Tralala</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Legendaria</text></svg>"}, {"id": "ballerina-capuccina", "name": "Ballerina Capuccina", "rarity": "epica", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Ballerina Capuccina (epica)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%238A2BE2'/>      <stop offset='1' stop-color='%234B0082'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Ballerina Capuccina</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Epica</text></svg>"}, {"id": "capuccino-asesino", "name": "Capuccino Asesino", "rarity": "rara", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Capuccino Asesino (rara)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%230070f3'/>      <stop offset='1' stop-color='%23001a66'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Capuccino Asesino</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Rara</text></svg>"}, {"id": "bombardiro-crocodilo", "name": "Bombardiro Cocodrilo", "rarity": "rara", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Bombardiro Cocodrilo (rara)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%230070f3'/>      <stop offset='1' stop-color='%23001a66'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Bombardiro Cocodrilo</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Rara</text></svg>"}, {"id": "tripi-tropa", "name": "Tripi Tropa Tropa Tripi", "rarity": "comun", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Tripi Tropa Tropa Tripi (comun)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23C0C0C0'/>      <stop offset='1' stop-color='%234a4a4a'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Tripi Tropa Tropa Tripi</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Comun</text></svg>"}, {"id": "boneka-ambalabu", "name": "Boneka Ambalabu", "rarity": "comun", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Boneka Ambalabu (comun)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23C0C0C0'/>      <stop offset='1' stop-color='%234a4a4a'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Boneka Ambalabu</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Comun</text></svg>"}, {"id": "lirili-larila", "name": "Lirili Larila", "rarity": "rara", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Lirili Larila (rara)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%230070f3'/>      <stop offset='1' stop-color='%23001a66'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Lirili Larila</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Rara</text></svg>"}, {"id": "tun-tun-zahur", "name": "Tun Tun Tun Tun Tun Zahur", "rarity": "epica", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Tun Tun Tun Tun Tun Zahur (epica)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%238A2BE2'/>      <stop offset='1' stop-color='%234B0082'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Tun Tun Tun Tun Tun Zahur</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Epica</text></svg>"}, {"id": "brainrot-09", "name": "Brainrot #09", "rarity": "comun", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2309 (comun)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23C0C0C0'/>      <stop offset='1' stop-color='%234a4a4a'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2309</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Comun</text></svg>"}, {"id": "brainrot-10", "name": "Brainrot #10", "rarity": "comun", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2310 (comun)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23C0C0C0'/>      <stop offset='1' stop-color='%234a4a4a'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2310</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Comun</text></svg>"}, {"id": "brainrot-11", "name": "Brainrot #11", "rarity": "rara", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2311 (rara)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%230070f3'/>      <stop offset='1' stop-color='%23001a66'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2311</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Rara</text></svg>"}, {"id": "brainrot-12", "name": "Brainrot #12", "rarity": "comun", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2312 (comun)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23C0C0C0'/>      <stop offset='1' stop-color='%234a4a4a'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2312</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Comun</text></svg>"}, {"id": "brainrot-13", "name": "Brainrot #13", "rarity": "rara", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2313 (rara)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%230070f3'/>      <stop offset='1' stop-color='%23001a66'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2313</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Rara</text></svg>"}, {"id": "brainrot-14", "name": "Brainrot #14", "rarity": "epica", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2314 (epica)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%238A2BE2'/>      <stop offset='1' stop-color='%234B0082'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2314</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Epica</text></svg>"}, {"id": "brainrot-15", "name": "Brainrot #15", "rarity": "comun", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2315 (comun)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23C0C0C0'/>      <stop offset='1' stop-color='%234a4a4a'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2315</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Comun</text></svg>"}, {"id": "brainrot-16", "name": "Brainrot #16", "rarity": "rara", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2316 (rara)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%230070f3'/>      <stop offset='1' stop-color='%23001a66'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2316</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Rara</text></svg>"}, {"id": "brainrot-17", "name": "Brainrot #17", "rarity": "comun", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2317 (comun)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23C0C0C0'/>      <stop offset='1' stop-color='%234a4a4a'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2317</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Comun</text></svg>"}, {"id": "brainrot-18", "name": "Brainrot #18", "rarity": "rara", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2318 (rara)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%230070f3'/>      <stop offset='1' stop-color='%23001a66'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2318</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Rara</text></svg>"}, {"id": "brainrot-19", "name": "Brainrot #19", "rarity": "epica", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2319 (epica)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%238A2BE2'/>      <stop offset='1' stop-color='%234B0082'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2319</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Epica</text></svg>"}, {"id": "brainrot-20", "name": "Brainrot #20", "rarity": "comun", "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 896' role='img' aria-label='Brainrot %2320 (comun)'>  <defs>    <linearGradient id='bg' x1='0' x2='1' y1='0' y2='1'>      <stop offset='0' stop-color='%23C0C0C0'/>      <stop offset='1' stop-color='%234a4a4a'/>    </linearGradient>    <filter id='grain'>      <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/>      <feColorMatrix type='saturate' values='0'/>      <feBlend mode='overlay'/>    </filter>  </defs>  <rect width='640' height='896' rx='32' fill='url(%23bg)'/>  <rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(0,0,0,0.25)' stroke='rgba(255,255,255,0.3)' stroke-width='2'/>  <g filter='url(%23grain)'><rect x='16' y='16' width='608' height='864' rx='24' fill='rgba(255,255,255,0.05)'/></g>  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='48' font-weight='800' fill='%23fff'>Brainrot %2320</text>  <text x='50%' y='85%' dominant-baseline='middle' text-anchor='middle'        font-family='Arial, Helvetica, sans-serif' font-size='28' fill='%23fff' opacity='0.9'>Comun</text></svg>"}];
+    <section id="buy">
+      <h2>Buy packs</h2>
+      <div class="kpi" style="margin-bottom:8px">
+        <div>
+          <strong>Pack (5 cards)</strong><br/>
+          <span style="font-size:20px;font-weight:900">1,000 ISK</span>
+        </div>
+        <div>
+          <strong>Box (10 packs)</strong><br/>
+          <span style="font-size:20px;font-weight:900">8,500 ISK</span>
+        </div>
+      </div>
+      <p class="muted small">Prices fixed as requested. Shipping or pickup info: [replace].</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn primary" href="#" onclick="alert('Replace this with your checkout link or WhatsApp number');return false;">Checkout</a>
+        <a class="btn ghost" href="#faq">Questions?</a>
+      </div>
+    </section>
 
-function renderCharacters(chars) {
-  const grid = document.querySelector('#characters-grid');
-  grid.innerHTML = '';
-  chars.forEach(c => {
-    const el = document.createElement('article');
-    el.className = 'card';
-    el.innerHTML = `
-      <img src="${c.image}" alt="${c.name} - ${c.rarity}" loading="lazy"/>
-      <div class="meta">
-        <strong>${c.name}</strong>
-        <span class="rarity ${c.rarity}">${c.rarity}</span>
-      </div>`;
-    el.addEventListener('click', () => openModal(c));
-    grid.appendChild(el);
-  });
-}
+    <section id="faq">
+      <h2>FAQ</h2>
+      <p><strong>What’s in a pack?</strong><br/><span class="muted">5 cards. We recommend guaranteeing at least 1 Rare or better per pack.</span></p>
+      <p><strong>How do prizes work?</strong><br/><span class="muted">Each purchase = entries. We publish winners on the dates listed above.</span></p>
+      <p><strong>Can I trade cards?</strong><br/><span class="muted">Yes — community trades are encouraged. Add your rules or Discord link here.</span></p>
+    </section>
 
-function applyFilter(chars, rarity) {
-  if (!rarity || rarity === 'todas') return chars;
-  return chars.filter(c => c.rarity === rarity);
-}
+    <footer>
+      <div class="small">© Brainrot Cards. All names are for fun. Art shown belongs to their creators.</div>
+    </footer>
+  </main>
 
-function setActiveFilter(r) {
-  document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
-  const btn = document.querySelector(`[data-filter="${r}"]`);
-  if (btn) btn.classList.add('active');
-}
+  <script>
+    // === Replace paths with your filenames in /cards/ ===
+    const CARDS = [
+      // Legendary (gold)
+      {name:'Bombardiro Crocodilo', rarity:'Legendary', atk:180, def:175, img:'cards/legend-bombardiro-crocodilo.jpg'},
+      {name:'Tralalero',              rarity:'Legendary', atk:170, def:160, img:'cards/legend-tralalero.jpg'},
+      {name:'Tun Tun Tun Zahur',      rarity:'Legendary', atk:180, def:150, img:'cards/legend-tun-tun-tun-zahur.jpg'},
 
-function openModal(card) {
-  const modal = document.querySelector('#modal');
-  modal.querySelector('img').src = card.image;
-  modal.querySelector('img').alt = card.name;
-  modal.querySelector('h3').textContent = card.name;
-  modal.querySelector('.rarity').textContent = card.rarity;
-  modal.querySelector('.rarity').className = 'rarity ' + card.rarity;
-  modal.classList.add('open');
-}
+      // Epic (purple)
+      {name:'Boneka Ambalabu',        rarity:'Epic', atk:80, def:85,  img:'cards/epic-boneka-ambalabu.jpg'},
+      {name:'Capuchino Asesino',      rarity:'Epic', atk:70, def:80,  img:'cards/epic-capuchino-asesino.jpg'},
+      {name:'Ballerina Cappuccina',   rarity:'Epic', atk:70, def:65,  img:'cards/epic-ballerina-cappuccina.jpg'},
+      {name:'Frigo Camelo',           rarity:'Epic', atk:72, def:82,  img:'cards/epic-frigo-camelo.jpg'},
+      {name:'Zibra Zubra Zebralini',  rarity:'Epic', atk:75, def:85,  img:'cards/epic-zibra-zubra-zebralini.jpg'},
 
-function closeModal() {
-  document.querySelector('#modal').classList.remove('open');
-}
+      // Rare (blue “SJALDGÆF”)
+      {name:'Vaca Saturno Saturnita', rarity:'Rare', atk:76, def:74,  img:'cards/rare-vaca-saturno.jpg'},
+      {name:'Cacto Hipopotamo',       rarity:'Rare', atk:77, def:78,  img:'cards/rare-cacto-hipopotamo.jpg'},
+      {name:'Trulimero Trulichina',   rarity:'Rare', atk:72, def:77,  img:'cards/rare-trulimero-trulichina.jpg'},
+      {name:'Lirili Larila',          rarity:'Rare', atk:70, def:74,  img:'cards/rare-lirili-larila.jpg'},
+      {name:'Bombombini Gusini',      rarity:'Rare', atk:78, def:72,  img:'cards/rare-bombombini-gusini.jpg'},
+      {name:'Brr Brr Patapim',        rarity:'Rare', atk:70, def:70,  img:'cards/rare-brr-brr-patapim.jpg'},
 
-function weightedDraw(items) {
-  const pool = [];
-  items.forEach(it => {
-    const w = rarityWeights[it.rarity] || 1;
-    for (let i = 0; i < w; i++) pool.push(it);
-  });
-  const idx = Math.floor(Math.random() * pool.length);
-  return pool[idx];
-}
+      // Common (white)
+      {name:'Jiraffa Celeste',        rarity:'Common', atk:61, def:65, img:'cards/common-jiraffa-celeste.jpg'},
+      {name:'Madin Din Din Dun',      rarity:'Common', atk:64, def:65, img:'cards/common-madin-din-din-dun.jpg'},
+      {name:'Espressona Signora',     rarity:'Common', atk:57, def:52, img:'cards/common-espressona-signora.jpg'},
+      {name:'Fruli Frula',            rarity:'Common', atk:58, def:52, img:'cards/common-fruli-frula.jpg'},
+      {name:'Tripi Tropi',            rarity:'Common', atk:58, def:60, img:'cards/common-tripi-tropi.jpg'},
+      {name:'Chimpanzini Bananini',   rarity:'Common', atk:58, def:60, img:'cards/common-chimpanzini-bananini.jpg'}
+    ];
 
-function openPack(characters) {
-  const out = document.querySelector('#pack-out');
-  out.innerHTML = '';
-  const picked = new Set();
-  const results = [];
-  while (results.length < 5) {
-    const c = weightedDraw(characters);
-    const key = c.id;
-    if (!picked.has(key)) {
-      picked.add(key); results.push(c);
+    const grid = document.getElementById('cardsGrid');
+    const filters = document.getElementById('filters');
+    let current = 'all';
+
+    function badge(r){
+      const cls = r==='Legendary'?'legendary':r==='Epic'?'epic':r==='Rare'?'rare':'common';
+      return `<span class="rar ${cls}">${r}</span>`;
     }
-  }
-  if (!results.some(c => ['rara','epica','legendaria'].includes(c.rarity) && c.rarity !== 'comun')) {
-    const commonsIdx = results.findIndex(c => c.rarity === 'comun');
-    const rarePool = characters.filter(c => ['rara','epica','legendaria'].includes(c.rarity));
-    results[commonsIdx] = rarePool[Math.floor(Math.random()*rarePool.length)];
-  }
-  results.forEach(c => {
-    const img = document.createElement('img');
-    img.src = c.image; img.alt = c.name; img.loading = 'lazy';
-    out.appendChild(img);
-  });
-}
 
-function updateKPIs() {
-  document.querySelector('#kpi-price').textContent = PRICE_PER_PACK.toLocaleString('is-IS') + ' ISK';
-  const remaining = Math.max(0, INVENTORY_TOTAL - inventorySold);
-  document.querySelector('#kpi-remaining').textContent = remaining.toLocaleString('is-IS');
-  document.querySelector('#kpi-total').textContent = INVENTORY_TOTAL.toLocaleString('is-IS');
-}
+    function render(){
+      const items = CARDS.filter(c => current==='all' ? true : c.rarity===current);
+      grid.innerHTML = items.map(c => `
+        <article class="card">
+          <div class="thumb">${c.img ? `<img src="${c.img}" alt="${c.name} card">` : ''}</div>
+          <div class="pad">
+            <div class="title">${c.name}</div>
+            <div class="row">
+              ${badge(c.rarity)}
+              <div class="stats">ATK ${c.atk} • DEF ${c.def}</div>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
 
-function buyNow() {
-  if (!STRIPE_CHECKOUT_URL || STRIPE_CHECKOUT_URL.includes('your-checkout-link')) {
-    alert('Configura tu enlace de Stripe en el JS (STRIPE_CHECKOUT_URL).');
-    return;
-  }
-  window.location.href = STRIPE_CHECKOUT_URL;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const all = CHARACTERS;
-  renderCharacters(all);
-  setActiveFilter('todas');
-  updateKPIs();
-
-  document.querySelectorAll('.filter').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const rarity = btn.getAttribute('data-filter');
-      setActiveFilter(rarity);
-      const filtered = applyFilter(all, rarity);
-      renderCharacters(filtered);
+    filters.addEventListener('click', e=>{
+      const chip = e.target.closest('.chip');
+      if(!chip) return;
+      [...filters.children].forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      current = chip.dataset.rarity;
+      render();
     });
-  });
 
-  document.querySelector('#open-pack').addEventListener('click', () => openPack(all));
-  document.querySelector('#buy-now').addEventListener('click', buyNow);
-  document.querySelector('#modal .close').addEventListener('click', closeModal);
-  document.querySelector('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
-});
-
-</script>
+    render();
+  </script>
 </body>
 </html>
